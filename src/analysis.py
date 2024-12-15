@@ -11,8 +11,11 @@ load_dotenv()
 API_KEY = os.getenv('YOUTUBE_API_KEY')
 
 CHANNEL_IDS = [
-    'UCXuqSBlHAE6Xw-yeJA0Tunw', # LTT
-    'UCX6OQ3DkcsbYNE6H8uQQuVA', # MR Beast
+    'UCXuqSBlHAE6Xw-yeJA0Tunw',  # LTT
+    'UCX6OQ3DkcsbYNE6H8uQQuVA',  # MR Beast
+    'UCBJycsmduvYEL83R_U4JriQ',  # mkbhd
+    'UCokIq0eihRhkiqClyV0WCdw',  # KrisKrohn
+    'UChIs72whgZI9w6d6FhwGGHA',  # GamersNexus
 ]
 
 
@@ -33,7 +36,8 @@ def get_channel_stats(youtube, channel_ids):
 
         for item in response['items']:
             data = {
-                'Channel_id': item['id'],
+                'Channel_id':
+                    item['id'],
                 'Channel_name':
                     item['snippet']['title'],
                 'Subscribers':
@@ -66,7 +70,9 @@ def get_video_ids(youtube, playlist_id, limit=5):
         )
         response = request.execute()
 
-        video_ids.extend(item['contentDetails']['videoId'] for item in response['items'])
+        video_ids.extend(
+            item['contentDetails']['videoId'] for item in response['items']
+        )
 
         next_page_token = response.get('nextPageToken')
         if not next_page_token or len(video_ids) >= limit:
@@ -97,7 +103,7 @@ def get_video_details(youtube, video_ids):
                     'Title':
                         video['snippet']['title'],
                     'Thumbnail':
-                        video['snippet']['thumbnails']['default']['url'],
+                        get_best_thumbnail(video['snippet']['thumbnails']),
                     'Language':
                         video['snippet'].get('defaultLanguage', None),
                     'Duration_minutes':
@@ -115,6 +121,18 @@ def get_video_details(youtube, video_ids):
 
     return all_video_stats
 
+
+def get_best_thumbnail(thumbnails):
+    """Select the best available thumbnail in order of resolution."""
+    return (
+        thumbnails.get('maxres', {}).get('url') or
+        thumbnails.get('standard', {}).get('url') or
+        thumbnails.get('high', {}).get('url') or
+        thumbnails.get('medium', {}).get('url') or
+        thumbnails.get('default', {}).get('url')
+    )
+
+
 def get_channel_video_data(youtube, channel_data):
     """Fetch video details for each channel"""
     all_details = []
@@ -128,18 +146,25 @@ def get_channel_video_data(youtube, channel_data):
         video_data.insert(0, 'Channel_name', channel['Channel_name'])
         video_data.insert(0, 'Channel_id', channel['Channel_id'])
 
-        video_data['Published_date'] = pd.to_datetime(video_data['Published_date']).dt.date
+        video_data['Published_date'] = pd.to_datetime(
+            video_data['Published_date']
+        ).dt.date
         video_data['Views'] = pd.to_numeric(video_data['Views'])
         video_data['Likes'] = pd.to_numeric(video_data['Likes'])
-        video_data['Duration_minutes'] = pd.to_numeric(video_data['Duration_minutes'])
+        video_data['Duration_minutes'] = pd.to_numeric(
+            video_data['Duration_minutes']
+        )
 
-        video_data['Click_rate'] = np.log1p(video_data['Views']) / np.log1p(channel['Subscribers'])
+        video_data['Click_rate'] = np.log1p(video_data['Views']) / np.log1p(
+            channel['Subscribers']
+        )
 
         all_details.append(video_data)
 
     combined_video_data = pd.concat(all_details, ignore_index=True)
 
     return combined_video_data
+
 
 def main():
     """Main function to execute the analysis."""

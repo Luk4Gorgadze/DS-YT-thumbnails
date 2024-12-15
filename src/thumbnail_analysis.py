@@ -69,7 +69,6 @@ def analyze_thumbnail(thumbnail_url, title):
         return {
             'Num_faces': len(faces),
             'Text': text.strip(),
-            'Title': title.strip(),
             'Brightness': brightness,
             'Contrast': contrast,
             'Saturation': saturation,
@@ -81,7 +80,6 @@ def analyze_thumbnail(thumbnail_url, title):
         return {
             'Num_faces': 0,
             'Text': '',
-            'Title': '',
             'Brightness': 0,
             'Contrast': 0,
             'Saturation': 0,

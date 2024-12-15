@@ -41,9 +41,7 @@ def analyze_thumbnail(thumbnail_url):
         brightness = np.mean(img_cv) / 255.0  # Normalize to [0, 1]
 
         # Contrast calculation
-        contrast = (
-            np.max(img_cv) - np.min(img_cv)
-        ) / 255.0  # Normalize to [0, 1]
+        contrast = np.std(img_cv) / 255.0
 
         # Saturation calculation
         img_hsv = cv2.cvtColor(

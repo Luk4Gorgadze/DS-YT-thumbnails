@@ -1,0 +1,43 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+dist/
+build/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Python test files
+*.cover
+*.log
+.coverage
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Pytest
+.cache
+pytest_cache/
+
+# Other files
+*.DS_Store
+*.pdb
+*.egg
+*.egg-info
+*.whl

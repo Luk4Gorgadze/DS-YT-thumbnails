@@ -105,7 +105,7 @@ def get_video_details(youtube, video_ids):
                     'Thumbnail':
                         get_best_thumbnail(video['snippet']['thumbnails']),
                     'Language':
-                        video['snippet'].get('defaultLanguage', None),
+                        get_supported_language(video),
                     'Duration_minutes':
                         math.ceil(duration_seconds / 60),
                     'Likes':
@@ -130,6 +130,14 @@ def get_best_thumbnail(thumbnails):
         thumbnails.get('high', {}).get('url') or
         thumbnails.get('medium', {}).get('url') or
         thumbnails.get('default', {}).get('url')
+    )
+
+
+def get_supported_language(video):
+    default_language = video['snippet'].get('defaultLanguage', None)
+
+    return default_language if default_language else video['snippet'].get(
+        'defaultAudioLanguage', None
     )
 
 

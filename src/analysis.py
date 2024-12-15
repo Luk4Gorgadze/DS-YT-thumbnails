@@ -143,6 +143,7 @@ def get_channel_video_data(youtube, channel_data):
         video_details = get_video_details(youtube, video_ids)
         video_data = pd.DataFrame(video_details)
 
+        video_data.insert(0, 'Subscribers', channel['Subscribers'])
         video_data.insert(0, 'Channel_name', channel['Channel_name'])
         video_data.insert(0, 'Channel_id', channel['Channel_id'])
 

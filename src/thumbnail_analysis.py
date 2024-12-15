@@ -5,11 +5,15 @@ import pandas as pd
 import requests
 import torch
 from PIL import Image, ImageEnhance
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 print(torch.cuda.is_available())
 
+# Initialize the TF-IDF Vectorizer
+vectorizer = TfidfVectorizer()
 
-def analyze_thumbnail(thumbnail_url):
+
+def analyze_thumbnail(thumbnail_url, title):
     """Analyze the thumbnail for faces, text, brightness, contrast, and saturation."""
     try:
         # Download the image with a timeout
@@ -53,21 +57,36 @@ def analyze_thumbnail(thumbnail_url):
 
         print(text)
 
+        # Vectorize the title and text only if they are not empty
+        vectorized_title = vectorizer.fit_transform(
+            [title]
+        ).toarray() if title.strip() else [
+        ]  # Vectorize the title if not empty
+        vectorized_text = vectorizer.fit_transform(
+            [text]
+        ).toarray() if text.strip() else []  # Vectorize the text if not empty
+
         return {
             'Num_faces': len(faces),
             'Text': text.strip(),
+            'Title': title.strip(),
             'Brightness': brightness,
             'Contrast': contrast,
             'Saturation': saturation,
+            'Vectorized_Text': vectorized_text.tolist(),
+            'Vectorized_Title': vectorized_title.tolist()
         }
     except Exception as e:
         print(f"Error analyzing thumbnail: {e}")
         return {
-            'num_faces': 0,
-            'text': '',
-            'brightness': 0,
-            'contrast': 0,
-            'saturation': 0,
+            'Num_faces': 0,
+            'Text': '',
+            'Title': '',
+            'Brightness': 0,
+            'Contrast': 0,
+            'Saturation': 0,
+            'Vectorized_Text': [],
+            'Vectorized_Title': []
         }
 
 
@@ -77,8 +96,8 @@ def perform_thumbnail_analysis(csv_file_path):
     channel_video_data = pd.read_csv(csv_file_path)
 
     # Perform thumbnail analysis
-    thumbnail_analysis = channel_video_data['Thumbnail'].apply(
-        analyze_thumbnail
+    thumbnail_analysis = channel_video_data.apply(
+        lambda row: analyze_thumbnail(row['Thumbnail'], row['Title']), axis=1
     )
     thumbnail_df = pd.DataFrame(thumbnail_analysis.tolist())
 

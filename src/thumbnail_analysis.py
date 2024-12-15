@@ -30,10 +30,6 @@ def analyze_thumbnail(thumbnail_url):
 
         # Initialize EasyOCR reader
         reader = easyocr.Reader(['en'], gpu=True)  # Specify the language
-        # if reader.device.type == 'cuda':
-        #     print("Using GPU for OCR.")
-        # else:
-        #     print("Using CPU for OCR.")
 
         # Text detection directly from the original image
         results = reader.readtext(img_cv)
@@ -41,19 +37,30 @@ def analyze_thumbnail(thumbnail_url):
         # Extract text from results
         text = " ".join([result[1] for result in results])
 
-        # Brightness, Contrast, and Saturation
+        # Brightness calculation
         brightness = np.mean(img_cv) / 255.0  # Normalize to [0, 1]
-        contrast = ImageEnhance.Contrast(img).enhance(1).getextrema()
-        saturation = ImageEnhance.Color(img).enhance(1).getextrema()
+
+        # Contrast calculation
+        contrast = (
+            np.max(img_cv) - np.min(img_cv)
+        ) / 255.0  # Normalize to [0, 1]
+
+        # Saturation calculation
+        img_hsv = cv2.cvtColor(
+            img_cv, cv2.COLOR_BGR2HSV
+        )  # Convert to HSV color space
+        saturation = np.mean(
+            img_hsv[:, :, 1]
+        ) / 255.0  # Normalize saturation channel to [0, 1]
 
         print(text)
 
         return {
-            'num_faces': len(faces),
-            'text': text.strip(),
-            'brightness': brightness,
-            'contrast': contrast,
-            'saturation': saturation,
+            'Num_faces': len(faces),
+            'Text': text.strip(),
+            'Brightness': brightness,
+            'Contrast': contrast,
+            'Saturation': saturation,
         }
     except Exception as e:
         print(f"Error analyzing thumbnail: {e}")
@@ -61,8 +68,8 @@ def analyze_thumbnail(thumbnail_url):
             'num_faces': 0,
             'text': '',
             'brightness': 0,
-            'contrast': (0, 0),
-            'saturation': (0, 0),
+            'contrast': 0,
+            'saturation': 0,
         }
 
 

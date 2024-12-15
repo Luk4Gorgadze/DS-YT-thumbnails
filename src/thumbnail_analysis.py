@@ -1,9 +1,12 @@
 import cv2
+import easyocr  # Import EasyOCR
 import numpy as np
 import pandas as pd
-import pytesseract
 import requests
+import torch
 from PIL import Image, ImageEnhance
+
+print(torch.cuda.is_available())
 
 
 def analyze_thumbnail(thumbnail_url):
@@ -21,24 +24,29 @@ def analyze_thumbnail(thumbnail_url):
         face_cascade = cv2.CascadeClassifier(
             cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
         )
-        gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(
-            gray, scaleFactor=1.1, minNeighbors=5
+            img_cv, scaleFactor=1.1, minNeighbors=5
         )
 
-        # Preprocess the image for better OCR results
-        gray_img = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-        _, binary_img = cv2.threshold(
-            gray_img, 150, 255, cv2.THRESH_BINARY_INV
-        )
+        # Initialize EasyOCR reader
+        reader = easyocr.Reader(['en'], gpu=True)  # Specify the language
+        # if reader.device.type == 'cuda':
+        #     print("Using GPU for OCR.")
+        # else:
+        #     print("Using CPU for OCR.")
 
-        # Text detection
-        text = pytesseract.image_to_string(binary_img, lang='eng')
+        # Text detection directly from the original image
+        results = reader.readtext(img_cv)
+
+        # Extract text from results
+        text = " ".join([result[1] for result in results])
 
         # Brightness, Contrast, and Saturation
         brightness = np.mean(img_cv) / 255.0  # Normalize to [0, 1]
         contrast = ImageEnhance.Contrast(img).enhance(1).getextrema()
         saturation = ImageEnhance.Color(img).enhance(1).getextrema()
+
+        print(text)
 
         return {
             'num_faces': len(faces),

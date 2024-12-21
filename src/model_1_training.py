@@ -10,7 +10,7 @@ from sklearn.preprocessing import OneHotEncoder
 from utils import create_image_data
 
 # Load the data
-data = pd.read_csv('storage/channel_videos_with_analysis.csv')
+data = pd.read_csv('/data/channel_videos_with_analysis.csv')
 
 # Select relevant features and target variable
 features = data[[

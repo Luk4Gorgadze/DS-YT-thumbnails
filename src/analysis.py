@@ -188,7 +188,7 @@ def main():
 
     channel_video_data = get_channel_video_data(youtube, channel_data)
 
-    channel_video_data.to_csv('storage/channel_videos.csv', index=False)
+    channel_video_data.to_csv('storage/data/channel_videos.csv', index=False)
 
 
 if __name__ == "__main__":

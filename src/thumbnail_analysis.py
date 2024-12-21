@@ -4,20 +4,15 @@ import numpy as np
 import pandas as pd
 import requests
 from PIL import Image
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-vectorizer = TfidfVectorizer()
 
 
-def analyze_thumbnail(thumbnail_url, title):
+def analyze_thumbnail(thumbnail_url):
     result = {
         'Num_faces': 0,
         'Text': '',
         'Brightness': 0,
         'Contrast': 0,
         'Saturation': 0,
-        'Vectorized_text': [],
-        'Vectorized_title': []
     }
 
     try:
@@ -61,18 +56,6 @@ def analyze_thumbnail(thumbnail_url, title):
     except Exception as e:
         print(f"Image metrics error: {e}")
 
-    try:
-        if title.strip():
-            result['Vectorized_title'] = vectorizer.fit_transform(
-                [title]
-            ).toarray().tolist()
-        if result['Text']:
-            result['Vectorized_text'] = vectorizer.fit_transform(
-                [result['Text']]
-            ).toarray().tolist()
-    except Exception as e:
-        print(f"Vectorization error: {e}")
-
     return result
 
 
@@ -80,10 +63,7 @@ def perform_thumbnail_analysis(csv_file_path):
     channel_video_data = pd.read_csv(csv_file_path)
 
     thumbnail_analysis = channel_video_data.apply(
-        lambda row: analyze_thumbnail(
-            row['Thumbnail'],
-            row['Title'],
-        ),
+        lambda row: analyze_thumbnail(row['Thumbnail']),
         axis=1,
     )
 
@@ -97,13 +77,13 @@ def perform_thumbnail_analysis(csv_file_path):
         axis=1,
     )
     channel_video_data.to_csv(
-        'storage/channel_videos_with_analysis.csv',
+        'storage/data/channel_videos_with_analysis.csv',
         index=False,
     )
 
 
 def main():
-    perform_thumbnail_analysis('storage/channel_videos.csv')
+    perform_thumbnail_analysis('storage/data/channel_videos.csv')
 
 
 if __name__ == "__main__":

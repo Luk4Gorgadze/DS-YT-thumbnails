@@ -114,7 +114,7 @@ def clean_youtube_data(df, channel_specific_outliers=True):
 
 
 def main():
-    data = pd.read_csv('storage/channel_videos_with_analysis.csv')
+    data = pd.read_csv('storage/data/channel_videos_with_analysis.csv')
     cleaned_data = clean_youtube_data(data)
     cleaned_data.to_csv(
         'storage/cleaned_channel_videos_with_analysis.csv', index=False

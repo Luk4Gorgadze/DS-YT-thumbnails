@@ -150,7 +150,7 @@ class YouTubeDataAnalyzer:
 def main():
     # Usage example
     analyzer = YouTubeDataAnalyzer(
-        'storage/cleaned_channel_videos_with_analysis.csv'
+        'storage/data/cleaned_channel_videos_with_analysis.csv'
     )
 
     # Run various analyses
